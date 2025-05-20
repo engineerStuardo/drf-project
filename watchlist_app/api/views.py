@@ -12,7 +12,7 @@ class WatchListView(APIView):
 
     def get(self, request):
         movies = WatchList.objects.all()
-        serializer = WatchListSerializer(movies, many=True)
+        serializer = WatchListSerializer(movies, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -40,7 +40,7 @@ class WatchListDetailView(APIView):
         if not movie:
             return Response({"message": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = WatchListSerializer(movie)
+        serializer = WatchListSerializer(movie, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -73,7 +73,7 @@ class StreamPlatformListView(APIView):
 
     def get(self, request):
         stream_platforms = StreamPlatform.objects.all()
-        serializer = StreamPlatformSerializer(stream_platforms, many=True)
+        serializer = StreamPlatformSerializer(stream_platforms, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -100,7 +100,7 @@ class StreamPlatformDetailView(APIView):
         stream_platform = self.get_object(pk)
         if not stream_platform:
             return Response({"message": "Stream platform not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = StreamPlatformSerializer(stream_platform)
+        serializer = StreamPlatformSerializer(stream_platform, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
