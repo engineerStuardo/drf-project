@@ -1,10 +1,9 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import status, mixins, generics
 
-
-from watchlist_app.models import WatchList, StreamPlatform
-from .serializers import WatchListSerializer, StreamPlatformSerializer
+from watchlist_app.models import WatchList, StreamPlatform, Review
+from .serializers import WatchListSerializer, StreamPlatformSerializer, ReviewSerializer
 
 
 class WatchListView(APIView):
@@ -12,7 +11,7 @@ class WatchListView(APIView):
 
     def get(self, request):
         movies = WatchList.objects.all()
-        serializer = WatchListSerializer(movies, many=True, context={'request': request})
+        serializer = WatchListSerializer(movies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -40,7 +39,7 @@ class WatchListDetailView(APIView):
         if not movie:
             return Response({"message": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = WatchListSerializer(movie, context={'request': request})
+        serializer = WatchListSerializer(movie)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -73,7 +72,7 @@ class StreamPlatformListView(APIView):
 
     def get(self, request):
         stream_platforms = StreamPlatform.objects.all()
-        serializer = StreamPlatformSerializer(stream_platforms, many=True, context={'request': request})
+        serializer = StreamPlatformSerializer(stream_platforms, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -100,7 +99,7 @@ class StreamPlatformDetailView(APIView):
         stream_platform = self.get_object(pk)
         if not stream_platform:
             return Response({"message": "Stream platform not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = StreamPlatformSerializer(stream_platform, context={'request': request})
+        serializer = StreamPlatformSerializer(stream_platform)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -122,3 +121,22 @@ class StreamPlatformDetailView(APIView):
             return Response({"message": "Stream platform not found"}, status=status.HTTP_404_NOT_FOUND)
         stream_platform.delete()
         return Response({"message": "Stream platform deleted successfully!", "status": "204"}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ReviewList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class ReviewDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
