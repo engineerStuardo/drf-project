@@ -1,6 +1,7 @@
 from django.urls import path, include
-from watchlist_app.api.views import WatchListView, WatchListDetailView, StreamPlatformListView, \
-    StreamPlatformDetailView, ReviewList, ReviewDetail
+from watchlist_app.api.views import (WatchListView, WatchListDetailView,
+                                     StreamPlatformListView, StreamPlatformDetailView,
+                                     ReviewList, ReviewDetail)
 
 urlpatterns = [
     path('list/', WatchListView.as_view(), name='watch_list'),
