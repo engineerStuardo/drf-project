@@ -1,4 +1,5 @@
 from rest_framework import viewsets, generics
+from rest_framework.exceptions import ValidationError
 
 from watchlist_app.models import WatchList, StreamPlatform, Review
 from .serializers import WatchListSerializer, StreamPlatformSerializer, ReviewSerializer
@@ -32,9 +33,18 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ReviewCreate(generics.CreateAPIView):
+    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
     def perform_create(self, serializer):
         pk = self.kwargs['pk']
         watchlist = WatchList.objects.get(pk=pk)
-        serializer.save(watchlist=watchlist)
+
+        review_user = self.request.user
+        review_queryset = Review.objects.filter(watchlist=watchlist, review_user=review_user)
+
+        if review_queryset.exists():
+            raise ValidationError("You have already reviewed this movie")
+
+        serializer.save(watchlist=watchlist, review_user=review_user)
+

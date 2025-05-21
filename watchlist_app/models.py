@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class WatchList(models.Model):
@@ -30,6 +31,7 @@ class Review(models.Model):
     update = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
     watchlist = models.ForeignKey('WatchList', on_delete=models.CASCADE, related_name='reviews')
+    review_user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.watchlist.title} | {self.description}"
